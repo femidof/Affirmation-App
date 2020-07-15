@@ -29,9 +29,19 @@ class LoadApp extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             FetchImage(),
+            DisplayQuote(),
           ],
         ),
       ),
+    );
+  }
+}
+
+class DisplayQuote extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text("You'll find a way"),
     );
   }
 }
