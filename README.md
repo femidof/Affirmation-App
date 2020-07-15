@@ -4,6 +4,9 @@ A new Flutter project.
 
 ## Getting Started
 
+N.B: Application consists an unadded file named "constants.dart" in the top directory of the lib folder.
+The constant file consists of consists of values like the API key for Unsplash image, Unsplash API URL, Quote API url and the Unsplash secret key.
+
 This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
