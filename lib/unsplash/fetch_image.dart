@@ -13,6 +13,7 @@ class _FetchImageState extends State<FetchImage> {
   @override
   void initState() {
     super.initState();
+    fetchImage();
   }
 
   Future<String> fetchImage() async {
@@ -22,16 +23,26 @@ class _FetchImageState extends State<FetchImage> {
           'Authorization': 'Client-ID $UNSPLASH_API_KEY'
         });
     if (response.statusCode != 200) {
+      print("ERROR MTF");
       throw Exception(
           "Unexpected HTTP code: ${response.statusCode} ---- ${response.body}");
     }
     var data = jsonDecode(response.body);
-    String url = data.urls.raw;
+    String url = data["urls"]["raw"];
+    //* Remove print(url);
     return url;
   }
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: buildFutureBuilder(),
+      ),
+    );
+  }
+
+  FutureBuilder<String> buildFutureBuilder() {
     return FutureBuilder(
       future: fetchImage(),
       builder: (context, snapshot) {
@@ -47,13 +58,15 @@ class _FetchImageState extends State<FetchImage> {
           case ConnectionState.active:
             Text("Connected and Waiting");
             break;
-          case ConnectionState.active:
-            Text("Done");
-            break;
+
           default:
-            Text("");
+            Text("WoW");
         }
-        return Text("snapshot.data");
+
+        // if (snapshot.hasError) {
+        //   print("Error from Unsplash API");
+        // }
+        return Text("${snapshot.data}");
       },
     );
   }
