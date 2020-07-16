@@ -13,6 +13,7 @@ class _FetchQuoteState extends State<FetchQuote> {
     var response = await http.get("$QUOTE_API_URL");
     var quote = jsonDecode(response.body)["affirmation"];
     print("$quote");
+    return quote;
   }
 
   @override

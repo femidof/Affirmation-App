@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:ui';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:affirmation_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,7 @@ class _FetchImageState extends State<FetchImage> {
   @override
   void initState() {
     super.initState();
-    fetchImage();
+    // fetchImage();
   }
 
   Future<String> fetchImage() async {
@@ -42,31 +43,70 @@ class _FetchImageState extends State<FetchImage> {
     );
   }
 
-  FutureBuilder<String> buildFutureBuilder() {
+  FutureBuilder buildFutureBuilder() {
     return FutureBuilder(
+      initialData:
+          "https://images.unsplash.com/photo-1594576396046-503121b82768?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjE0ODI2MX0",
       future: fetchImage(),
       builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            Text("An Error Occured");
-            break;
+        // switch (snapshot.connectionState) {
+        //   case ConnectionState.none:
+        //     Text("An Error Occured");
+        //     break;
 
-          case ConnectionState.waiting:
-            Text("Loading and waiting");
-            break;
+        //   case ConnectionState.waiting:
+        //     Text("Loading and waiting");
+        //     break;
 
-          case ConnectionState.active:
-            Text("Connected and Waiting");
-            break;
+        //   case ConnectionState.active:
+        //     Text("Connected and Waiting");
+        //     break;
 
-          default:
-            Text("WoW");
-        }
-
-        // if (snapshot.hasError) {
-        //   print("Error from Unsplash API");
+        //   default:
+        //     SpinKitFadingCube(
+        //       color: Colors.deepPurple,
+        //       size: 20,
+        //     );
         // }
-        return Text("${snapshot.data}");
+
+        if (snapshot.hasError) {
+          print("Error from Unsplash API: ${snapshot.error}");
+          return Container(
+            child: Icon(
+              Icons.cancel,
+              size: 70,
+              color: Colors.red,
+            ),
+          );
+        } else if (snapshot.hasData) {
+          print("${snapshot.data}");
+          return Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                  snapshot.data,
+                ),
+                fit: BoxFit.cover,
+                // height: double.infinity,
+                // width: double.infinity,
+                alignment: Alignment.center,
+              ),
+            ),
+            child:
+                //  Container(),
+                BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 07, sigmaY: 07),
+              child: Container(
+                color: Colors.black.withOpacity(0.4),
+              ),
+            ),
+          );
+        } else {
+          return SpinKitFadingCube(
+            color: Colors.deepPurple,
+            size: 70,
+          );
+        }
       },
     );
   }
