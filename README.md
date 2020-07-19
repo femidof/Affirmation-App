@@ -1,6 +1,6 @@
 # affirmation_app
 
-A new Flutter project.
+A new Flutter project, to display affirmation quotes from https://www.affirmations.dev provided by annthurium/affirmations{https://github.com/annthurium/affirmations}. This App provide daily notification as long has it runs in background. Havent tested if it runs headless. Just for fun
 
 ## Getting Started
 
