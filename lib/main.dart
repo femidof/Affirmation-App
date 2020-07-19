@@ -1,25 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:affirmation_app/constants.dart';
 import 'package:affirmation_app/unsplash/fetch_image.dart';
 // import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// void backgroundFetchHeadlessTask() async {
-//   print("[BackgroundFetch] Headless event recieved");
-
-//   // SharedPreferences preferences = await SharedPreferences.getInstance();
-
-//   // BackgroundFetch.finish();
-// }
 
 void main() {
   runApp(MyApp());
-
-  // Run On the Background
-  // BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatefulWidget {
@@ -33,9 +23,24 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializing();
   }
 
-  // Future<void> initPlatformState() async {}
+  void initializing() async {
+    androidInitializationSettings = AndroidInitializationSettings('app_icon');
+    iosInitializationSettings = IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    initializationSettings = InitializationSettings(
+        androidInitializationSettings, iosInitializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+  }
+
+  Future onSelectNotification(String payload) async {
+    if (payload != null) {
+      debugPrint('Notification payload: $payload');
+    }
+  }
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -43,7 +48,45 @@ class _MyAppState extends State<MyApp> {
   IOSInitializationSettings iosInitializationSettings;
   InitializationSettings initializationSettings;
 
-  void _showNotification() {}
+  Future onDidReceiveLocalNotification(
+      int id, String title, String body, String payload) async {
+    return CupertinoAlertDialog(
+      title: Text(title),
+      content: Text(body),
+      actions: <Widget>[
+        CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              print("");
+            },
+            child: Text("Okay")),
+      ],
+    );
+  }
+
+  Future<void> notifyOthers() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'channel_ID', 'channel name', 'channel description',
+        importance: Importance.Max,
+        priority: Priority.High,
+        ticker: 'test ticker');
+
+    var iOSChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.cancelAll();
+    Future<String> fetchQuote() async {
+      var response = await http.get("$QUOTE_API_URL");
+      var quote = jsonDecode(response.body)["affirmation"];
+
+      return quote;
+    }
+
+    await flutterLocalNotificationsPlugin.periodicallyShow(0, 'Today\'s Quote',
+        '${await fetchQuote()}', RepeatInterval.Daily, platformChannelSpecifics,
+        payload: 'show payload content');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +125,14 @@ class DisplayQuote extends StatefulWidget {
 }
 
 class _DisplayQuoteState extends State<DisplayQuote> {
+  // Future<String> _future;
   String quote;
   Future<String> fetchQuote() async {
     var response = await http.get("$QUOTE_API_URL");
     var quote = jsonDecode(response.body)["affirmation"];
     print("$quote");
+
+    await MyApp().createState().notifyOthers();
     return quote;
   }
 
@@ -96,12 +142,12 @@ class _DisplayQuoteState extends State<DisplayQuote> {
       alignment: Alignment.center,
       padding: EdgeInsets.all(25),
       child: Center(
-        child: FutureBuilder(
-          future: fetchQuote(),
+        child: StreamBuilder(
+          stream: Stream.periodic(Duration(seconds: 50))
+              .asyncMap((i) => fetchQuote()),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               quote = snapshot.data;
-
               return Text(
                 "$quote",
                 textAlign: TextAlign.center,
@@ -116,10 +162,6 @@ class _DisplayQuoteState extends State<DisplayQuote> {
             }
           },
         ),
-        // child: Text(
-        //   "You'll find a way",
-        //   style: TextStyle(color: Colors.white, fontSize: 30),
-        // ),
       ),
     );
   }

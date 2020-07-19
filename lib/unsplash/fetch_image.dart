@@ -14,7 +14,6 @@ class _FetchImageState extends State<FetchImage> {
   @override
   void initState() {
     super.initState();
-    // fetchImage();
   }
 
   Future<String> fetchImage() async {
@@ -30,7 +29,7 @@ class _FetchImageState extends State<FetchImage> {
     }
     var data = jsonDecode(response.body);
     String url = data["urls"]["raw"];
-    //* Remove print(url);
+    // print("from API print $url");
     return url;
   }
 
@@ -45,30 +44,10 @@ class _FetchImageState extends State<FetchImage> {
 
   FutureBuilder buildFutureBuilder() {
     return FutureBuilder(
-      initialData:
-          "https://images.unsplash.com/photo-1594576396046-503121b82768?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjE0ODI2MX0",
+      // initialData:
+      //     "https://images.unsplash.com/photo-1594576396046-503121b82768?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjE0ODI2MX0",
       future: fetchImage(),
       builder: (context, snapshot) {
-        // switch (snapshot.connectionState) {
-        //   case ConnectionState.none:
-        //     Text("An Error Occured");
-        //     break;
-
-        //   case ConnectionState.waiting:
-        //     Text("Loading and waiting");
-        //     break;
-
-        //   case ConnectionState.active:
-        //     Text("Connected and Waiting");
-        //     break;
-
-        //   default:
-        //     SpinKitFadingCube(
-        //       color: Colors.deepPurple,
-        //       size: 20,
-        //     );
-        // }
-
         if (snapshot.hasError) {
           print("Error from Unsplash API: ${snapshot.error}");
           return Container(
@@ -79,7 +58,7 @@ class _FetchImageState extends State<FetchImage> {
             ),
           );
         } else if (snapshot.hasData) {
-          print("${snapshot.data}");
+          print("photo: ${snapshot.data}");
           return Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -87,14 +66,10 @@ class _FetchImageState extends State<FetchImage> {
                   snapshot.data,
                 ),
                 fit: BoxFit.cover,
-                // height: double.infinity,
-                // width: double.infinity,
                 alignment: Alignment.center,
               ),
             ),
-            child:
-                //  Container(),
-                BackdropFilter(
+            child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 07, sigmaY: 07),
               child: Container(
                 color: Colors.black.withOpacity(0.4),
