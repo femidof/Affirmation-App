@@ -19,3 +19,10 @@ For help getting started with Flutter, view our
 samples, guidance on mobile development, and a full API reference.
 
 -------------------------------------------------------------------------------------------------------------
+
+## App Description
+
+App is linked to two APIs, one for getting random beautiful images from unsplash{http://unsplash.com}, and the other is for getting the affirmation quote from https://www.affirmations.dev. The app hits the endpoint of unsplash by getting random images and this is very limited for development because you can only make only 50 request in an hour, and you can hit the quote endpoint limitlessly(i really dont mean that lol).
+
+## Screenshot
+
